@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Art Space</string>
+
+    <!-- Artwork 1 -->
+    <string name="artwork_title_1">Seated Woman with Bent Knees</string>
+    <string name="artist_year_1">Egon Schiele (1917)</string>
+
+    <!-- Artwork 2 -->
+    <string name="artwork_title_2">The Kiss</string>
+    <string name="artist_year_2">Gustav Klimt (1908)</string>
+
+    <!-- Artwork 3 -->
+    <string name="artwork_title_3">The Son Of Man</string>
+    <string name="artist_year_3">René Magritte (1964)</string>
+
+    <!-- Artwork 4 -->
+    <string name="artwork_title_4">Self-Portrait with Thorn Necklace and Hummingbird</string>
+    <string name="artist_year_4">Frida Kahlo (1940)</string>
+
+    <!-- Artwork 5 -->
+    <string name="artwork_title_5">Cow\'s Skull: Red, White, and Blue</string>
+    <string name="artist_year_5">Georgia O\'Keeffe (1931)</string>
+
+    <!-- Default -->
+    <string name="artwork_title_default">Artwork Title</string>
+    <string name="artist_year_default">Artist (Year)</string>
+</resources>
