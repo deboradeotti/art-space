@@ -3,6 +3,13 @@ package com.example.artspace
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +66,7 @@ data class Artwork(
     val authorYear: Int
 )
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ArtSpaceLayout(modifier: Modifier = Modifier) {
     var artworkIndex by remember { mutableStateOf(1) }
@@ -87,14 +95,27 @@ fun ArtSpaceLayout(modifier: Modifier = Modifier) {
             Text(text = "\uD83C\uDFA8", fontSize = 24.sp)
             Text(text = "\uD83D\uDD8C\uFE0F", fontSize = 24.sp)
         }
-        ArtSpaceComponent(artworkIndex)
+        AnimatedContent(
+            targetState = artworkIndex,
+            transitionSpec = {
+                if (targetState > initialState) {
+                    slideInHorizontally { width -> width } + fadeIn() with
+                            slideOutHorizontally { width -> -width } + fadeOut()
+                } else {
+                    slideInHorizontally { width -> -width } + fadeIn() with
+                            slideOutHorizontally { width -> width } + fadeOut()
+                }
+            },
+            label = ""
+        ) { targetState -> ArtSpaceComponent(targetState)
+        }
         Row (
             modifier = modifier.padding(start = 12.dp, end = 12.dp)
         )
         {
             Button(
                 onClick = {
-                  if (artworkIndex < 1) {
+                  if (artworkIndex <= 1) {
                       artworkIndex = 5
                   } else {
                       artworkIndex--
