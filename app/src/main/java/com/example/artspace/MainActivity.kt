@@ -12,6 +12,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,12 +22,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,17 +63,33 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-data class Artwork(
+data class Artwork (
     val imageId: Int,
     val title: Int,
-    val authorYear: Int
+    val authorYear: Int,
+    var isFavorite: MutableState<Boolean> = mutableStateOf(false)
 )
+
+object  ArtRepository {
+    val artworks = mutableListOf(
+        Artwork(R.drawable.artwork_1, R.string.artwork_title_1, R.string.artist_year_1),
+        Artwork(R.drawable.artwork_2, R.string.artwork_title_2, R.string.artist_year_2),
+        Artwork(R.drawable.artwork_3, R.string.artwork_title_3, R.string.artist_year_3),
+        Artwork(R.drawable.artwork_4, R.string.artwork_title_4, R.string.artist_year_4),
+        Artwork(R.drawable.artwork_5, R.string.artwork_title_5, R.string.artist_year_5)
+    )
+
+    fun toggleFavorite(index: Int) {
+        val artwork = artworks[index]
+        artwork.isFavorite.value = !artwork.isFavorite.value
+    }
+}
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ArtSpaceLayout(modifier: Modifier = Modifier) {
-    var artworkIndex by remember { mutableStateOf(1) }
-    val totalArtworks = 5
+    var artworkIndex by remember { mutableStateOf(0) }
+    val totalArtworks = 4
 
     Column (
         modifier = modifier
@@ -107,7 +126,12 @@ fun ArtSpaceLayout(modifier: Modifier = Modifier) {
                 }
             },
             label = ""
-        ) { targetState -> ArtSpaceComponent(targetState)
+        ) {
+            targetState ->
+            val currentArtwork = ArtRepository.artworks[targetState]
+            ArtSpaceComponent(
+                artwork = currentArtwork,
+                onFavoriteClick = { ArtRepository.toggleFavorite(targetState) })
         }
         Row (
             modifier = modifier.padding(start = 12.dp, end = 12.dp)
@@ -115,8 +139,8 @@ fun ArtSpaceLayout(modifier: Modifier = Modifier) {
         {
             Button(
                 onClick = {
-                  if (artworkIndex <= 1) {
-                      artworkIndex = 5
+                  if (artworkIndex <= 0) {
+                      artworkIndex = 4
                   } else {
                       artworkIndex--
                   }
@@ -129,7 +153,7 @@ fun ArtSpaceLayout(modifier: Modifier = Modifier) {
             Button(
                 onClick = {
                     if (artworkIndex >= totalArtworks) {
-                        artworkIndex = 1
+                        artworkIndex = 0
                     } else {
                         artworkIndex++
                     }},
@@ -142,12 +166,23 @@ fun ArtSpaceLayout(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ArtSpaceComponent(index: Int, modifier: Modifier = Modifier) {
-    val artwork = handleTextAndImage(index = index)
+fun ArtSpaceComponent(
+    artwork: Artwork,
+    onFavoriteClick: (Artwork) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column (
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Row (modifier = modifier.padding(bottom = 16.dp)) {
+            val iconId = if (artwork.isFavorite.value) R.drawable.favorite_filled else R.drawable.favorite_outline
+            Image(
+                painter = painterResource(id = iconId),
+                contentDescription = null,
+                modifier = modifier.clickable(onClick = { onFavoriteClick(artwork) }).size(32.dp)
+            )
+        }
         Surface (
             shadowElevation = 6.dp
         ) {
@@ -168,7 +203,7 @@ fun ArtSpaceComponent(index: Int, modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(id = artwork.title),
                 style = MaterialTheme.typography.bodyLarge,
-                fontSize = 36.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Light
             )
             Spacer(modifier = modifier.height(8.dp))
@@ -178,18 +213,6 @@ fun ArtSpaceComponent(index: Int, modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Bold
             )
         }
-    }
-}
-
-@Composable
-fun handleTextAndImage(index: Int): Artwork {
-    return when (index) {
-        1 -> Artwork(R.drawable.artwork_1, R.string.artwork_title_1, R.string.artist_year_1)
-        2 -> Artwork(R.drawable.artwork_2, R.string.artwork_title_2, R.string.artist_year_2)
-        3 -> Artwork(R.drawable.artwork_3, R.string.artwork_title_3, R.string.artist_year_3)
-        4 -> Artwork(R.drawable.artwork_4, R.string.artwork_title_4, R.string.artist_year_4)
-        5 -> Artwork(R.drawable.artwork_5, R.string.artwork_title_5, R.string.artist_year_5)
-        else -> Artwork(R.drawable.artwork_default, R.string.artwork_title_default, R.string.artist_year_default)
     }
 }
 
